@@ -1,17 +1,14 @@
 import { Router, Request, Response } from 'express';
-import TaskModel from '../models/task';
+import TaskRepository from '../repositories/taskRepository';
+import ITask from '../models/task';
+
 
 const router = Router();
+const taskRepository = new TaskRepository()
 
 router.post('/', async (req: Request, res: Response) => {
-    const task = new TaskModel({
-        title: req.body.title,
-        description: req.body.description,
-        isCompleted: false,
-    });
-
     try {
-        const dataToSave = await task.save();
+        const dataToSave = await taskRepository.create(req.body as ITask)
         res.status(201).json(dataToSave)
     }
     catch (error: any) {
@@ -21,7 +18,7 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.get('/', async (req: Request, res: Response) => {
     try {
-        const data = await TaskModel.find();
+        const data = await taskRepository.getAll();
         res.json(data)
     }
     catch (error: any) {
@@ -31,7 +28,7 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.get('/:id', async (req: Request, res: Response) => {
     try {
-        const data = await TaskModel.findById(req.params.id);
+        const data = await taskRepository.get(req.params.id);
         res.json(data)
     }
     catch (error: any) {
@@ -41,14 +38,10 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 router.patch('/:id', async (req: Request, res: Response) => {
     try {
-        const id = req.params.id;
-        const updatedData = req.body;
-        const options = { new: true };
-
-        const result = await TaskModel.findByIdAndUpdate(
-            id, updatedData, options
+        const result = await taskRepository.update(
+            req.params.id,
+            req.body
         )
-
         res.send(result)
     }
     catch (error: any) {
@@ -58,9 +51,8 @@ router.patch('/:id', async (req: Request, res: Response) => {
 
 router.delete('/:id', async (req: Request, res: Response) => {
     try {
-        const id = req.params.id;
-        const data = await TaskModel.findByIdAndDelete(id)
-        res.status(204).send(`Document with ${data!.title} has been deleted..`)
+        const data = await taskRepository.delete(req.params.id);
+        res.status(204).send(`Document with ${data.title} has been deleted..`)
     }
     catch (error: any) {
         res.status(400).json({ message: error.message })
