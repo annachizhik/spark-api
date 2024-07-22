@@ -8,7 +8,10 @@ const taskRepository = new TaskRepository()
 
 router.post('/', async (req: Request, res: Response) => {
     try {
-        const dataToSave = await taskRepository.create(req.body as ITask)
+        const createdAt = Date.now()
+        const sortId = 0
+        const teaskToCreate = {createdAt, sortId, ...req.body}
+        const dataToSave = await taskRepository.create(teaskToCreate as ITask)
         res.status(201).json(dataToSave)
     }
     catch (error: any) {
@@ -18,7 +21,7 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.get('/', async (req: Request, res: Response) => {
     try {
-        const data = await taskRepository.getAll();
+        const data = await taskRepository.getRootTasks();
         res.json(data)
     }
     catch (error: any) {
@@ -29,6 +32,16 @@ router.get('/', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
     try {
         const data = await taskRepository.get(req.params.id);
+        res.json(data)
+    }
+    catch (error: any) {
+        res.status(500).json({ message: error.message })
+    }
+});
+
+router.get('/:id/subtasks/', async (req: Request, res: Response) => {
+    try {
+        const data = await taskRepository.getSubtasks(req.params.id);
         res.json(data)
     }
     catch (error: any) {

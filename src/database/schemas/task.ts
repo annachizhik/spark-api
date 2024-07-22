@@ -6,13 +6,37 @@ const taskSchema = new mongoose.Schema<ITask>({
     required: true,
     type: String
   },
-  description: {
+  status: {
     required: true,
+    type: Number
+  },
+  createdAt: {
+    required: true,
+    type: Date
+  },
+  sortId: {
+    required: true,
+    type: Number
+  },
+  editedAt: {
+    required: false,
+    type: Date
+  },
+  deletedAt: {
+    required: false,
+    type: Date
+  },
+  writing: {
+    required: false,
     type: String
   },
-  isCompleted: {
-    required: true,
-    type: Boolean
+  parentId: {
+    required: false,
+    type: String
+  },
+  description: {
+    required: false,
+    type: String
   }
 })
 
